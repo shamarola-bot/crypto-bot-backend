@@ -1,0 +1,8 @@
+{
+  "name": "crypto-bot-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/shamarola-bot/crypto-bot-backend.git",
+  "author": "shamarola-bot <ttv.shamarola@gmail.com>",
+  "license": "MIT"
+}
