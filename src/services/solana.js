@@ -18,24 +18,31 @@ class SolanaService {
 
   async buyMemecoin(publicKey, memecoinMint, amountInSol) {
     try {
-      const fromPublicKey = new PublicKey(publicKey);
-      const amountInLamports = amountInSol * LAMPORTS_PER_SOL;
+       try {
+    const fromPublicKey = new PublicKey(publicKey);
+    const amountInLamports = amountInSol * LAMPORTS_PER_SOL;
 
-      // Create a new transaction
-      const transaction = new Transaction().add(
-        SystemProgram.transfer({
-          fromPubkey: fromPublicKey,
-          toPubkey: new PublicKey(memecoinMint), // Simplified; should be a token account
-          lamports: amountInLamports,
-        })
-      );
+    const transaction = new Transaction().add(
+      SystemProgram.transfer({
+        fromPubkey: fromPublicKey,
+        toPubkey: new PublicKey(memecoinMint),
+        lamports: amountInLamports,
+      })
+    );
 
-      // Sign and send transaction (simplified; requires wallet signature)
-      // In a real app, use a wallet adapter (e.g., Phantom) to sign
-      const signature = await this.connection.sendRawTransaction(transaction.serialize());
-      await this.connection.confirmTransaction(signature);
+    const { blockhash } = await this.connection.getLatestBlockhash();
+    transaction.recentBlockhash = blockhash;
+    transaction.feePayer = fromPublicKey;
 
-      return { message: `Bought ${amountInSol} SOL worth of ${memecoinMint}`, signature };
+    // This will fail without a signer; log the error for debugging
+    const signature = await this.connection.sendRawTransaction(transaction.serialize());
+    await this.connection.confirmTransaction(signature);
+
+    return { message: `Bought ${amountInSol} SOL worth of ${memecoinMint}`, signature };
+  } catch (error) {
+    console.error("Buy error:", error.message);
+    throw new Error(`Buy failed: ${error.message}`);
+  }
     } catch (error) {
       throw new Error(`Buy failed: ${error.message}`);
     }
