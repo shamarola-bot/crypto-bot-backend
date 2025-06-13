@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const solanaService = require("../services/solana");
-const aiService = require("../services/ai");
 
 router.get("/balance/:publicKey", async (req, res) => {
   try {
@@ -12,24 +11,26 @@ router.get("/balance/:publicKey", async (req, res) => {
   }
 });
 
-router.get("/signal/:tokenId", async (req, res) => {
+router.get("/signal/solana", (req, res) => {
+  // Placeholder signal logic
+  res.json({ signal: "buy", price: 145.19, movingAverage: 155.11 });
+});
+
+router.post("/swap", async (req, res) => {
   try {
-    const signal = await aiService.generateBuySignal(req.params.tokenId);
-    res.json(signal);
+    const { publicKey, tokenMint, amount } = req.body;
+    const result = await solanaService.createSwapTransaction(publicKey, tokenMint, amount);
+    res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-router.post("/swap", async (req, res) => {
-  const { publicKey, tokenMint, amount } = req.body;
+router.post("/buy-memecoin", async (req, res) => {
   try {
-    const swapTx = await solanaService.createSwapTransaction(
-      publicKey,
-      tokenMint,
-      amount
-    );
-    res.json(swapTx);
+    const { publicKey, memecoinMint, amountInSol } = req.body;
+    const result = await solanaService.buyMemecoin(publicKey, memecoinMint, amountInSol);
+    res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
