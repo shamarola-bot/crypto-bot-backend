@@ -1,7 +1,7 @@
+require("dotenv").config({ path: 'C:\\Users\\ilics\\crypto-bot-backend\\.env' });
 const express = require("express");
 const cors = require("cors");
 const apiRoutes = require("./routes/api");
-require("dotenv").config();
 
 const app = express();
 
